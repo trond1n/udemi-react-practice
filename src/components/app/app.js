@@ -20,13 +20,20 @@ export default class App extends Component {
     this.state = {
       data: [
         // { label: "Going to learn JS", important: false, id: "sda" },
-        { label: "Going to learn React", important: true, id: 1 },
-        { label: "Going to learn Vue", important: false, id: 2 },
-        { label: "Going to learn Angular", important: false, id: 3 },
+        { label: "Going to learn React", important: true, like: false, id: 1 },
+        { label: "Going to learn Vue", important: false, like: false, id: 2 },
+        {
+          label: "Going to learn Angular",
+          important: false,
+          like: false,
+          id: 3,
+        },
       ],
     };
     this.deleteItem = this.deleteItem.bind(this);
     this.addItem = this.addItem.bind(this);
+    this.onToggleImportant = this.onToggleImportant.bind(this);
+    this.onToggleLiked = this.onToggleLiked.bind(this);
     this.maxId = 4;
   }
 
@@ -56,15 +63,44 @@ export default class App extends Component {
     });
   }
 
+  onToggleImportant(id) {
+    // console.log(`important ${id}`)
+  }
+
+ onToggleLiked(id) {
+  // console.log(`likw ${id}`)
+
+        this.setState(({data}) => {
+            const index = data.findIndex(elem => elem.id === id);
+
+            const old = data[index];
+            const newItem = {...old, like: !old.like};
+
+            const newArr = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
+            return {
+                data: newArr
+            }
+        }); 
+    }
+
   render() {
+    const { data } = this.state;
+    const liked = data.filter((item) => item.like).length;
+    const allPosts = data.length;
+
     return (
       <AppBlock>
-        <AppHeader />
+        <AppHeader liked={liked} allPosts={allPosts} />
         <div className="search-panel d-flex">
           <SearchPanel />
           <PostStatusFilter />
         </div>
-        <PostList posts={this.state.data} onDelete={this.deleteItem} />
+        <PostList
+          posts={this.state.data}
+          onDelete={this.deleteItem}
+          onToggleImportant={this.onToggleImportant}
+          onToggleLiked={this.onToggleLiked}
+        />
         <PostAddForm onAdd={this.addItem} />
       </AppBlock>
     );
